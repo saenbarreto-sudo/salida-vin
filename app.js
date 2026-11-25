@@ -4,7 +4,7 @@
    se guardan en el celular y se suben cuando vuelve la conexión. */
 (function () {
 'use strict';
-const VERSION = '2.0.2';
+const VERSION = '2.0.3';
 const CFG = window.CFG || {};
 const URL_ = (CFG.SUPABASE_URL || '').replace(/\/+$/, '');
 const KEY = CFG.SUPABASE_KEY || '';
@@ -98,7 +98,8 @@ const enc = encodeURIComponent;
 
 /* ======================= estado ======================= */
 let LISTS = lget('c:lists', []);       // [{id,name,type,archived,columns,stages,created_at,updated_at}]
-let TPL = lget('c:tpl', {});           // {tipo: [stages]}
+const DEF_TPL = { 'Despacho': [{ id: 'escaneado', label: 'Escaneado', color: '#334155' }, { id: 'carga', label: 'Llevado a carga', color: '#1d5fd6' }, { id: 'washing', label: 'Washing', color: '#0e7490' }, { id: 'picking', label: 'Picking list', color: '#6d28d9' }, { id: 'inspeccionado', label: 'Inspeccionado', color: '#17803f' }], 'Quick in / Quick out': [{ id: 'picking', label: 'Picking list', color: '#6d28d9' }, { id: 'carga', label: 'Llevado a carga', color: '#1d5fd6' }], 'Otra': [{ id: 'escaneado', label: 'Escaneado', color: '#334155' }, { id: 'carga', label: 'Llevado a carga', color: '#1d5fd6' }, { id: 'washing', label: 'Washing', color: '#0e7490' }, { id: 'picking', label: 'Picking list', color: '#6d28d9' }, { id: 'inspeccionado', label: 'Inspeccionado', color: '#17803f' }] };
+let TPL = lget('c:tpl', null) || DEF_TPL; // {tipo: [stages]}
 let curId = lget('cur', null);
 let VEH = [];                           // [{vin, ...campos}]
 let MARKS = {};                         // vin -> stage -> {t,by,note,photo}
@@ -490,6 +491,7 @@ $('file').onchange = async e => {
       + '<select data-ms="' + i + '" aria-label="' + esc(k.label) + '"><option value="card">' + esc(tr('Ver en tarjeta')) + '</option><option value="detail">' + esc(tr('Solo en detalle')) + '</option><option value="no">' + esc(tr('No guardar')) + '</option></select></div>').join('');
     cols.forEach((k, i) => { document.querySelector('[data-ms="' + i + '"]').value = k.show; });
     $('impName').value = f.name.replace(/\.[^.]+$/, '').slice(0, 40);
+    try { const t = await api('settings?key=eq.templates&select=value'); if (t && t[0] && t[0].value) { TPL = t[0].value; lset('c:tpl', TPL); } } catch (e) {}
     const types = Object.keys(TPL).filter(k => !k.startsWith('__')); if (!types.length) types.push('Despacho');
     $('impType').innerHTML = types.map(t => '<option value="' + esc(t) + '">' + esc(tr(t)) + '</option>').join('');
     $('impA').hidden = !curId; open_('imp');
@@ -511,7 +513,7 @@ function rowsToVehicles(map) { return IMP.data.map(r => { const o = { vin: clean
 $('impC').onclick = () => { close_('imp'); IMP = null; };
 $('impY').onclick = async () => {
   if (!IMP) return; const map = readMapping(), name = $('impName').value.trim() || tr('Lista nueva'), type = $('impType').value;
-  const stages = JSON.parse(JSON.stringify(TPL[type] || TPL.Despacho || [{ id: 'picking', label: 'Picking list', color: '#6d28d9' }]));
+  const stages = JSON.parse(JSON.stringify(TPL[type] || DEF_TPL[type] || DEF_TPL.Despacho));
   const columns = map.map(m => ({ key: m.key, label: m.label, show: m.show })), vehicles = rowsToVehicles(map);
   const id = slug(name).replace(/_/g, '-') + '-' + Date.now().toString(36);
   close_('imp');
