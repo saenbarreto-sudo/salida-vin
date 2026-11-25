@@ -1,5 +1,5 @@
 /* Service worker: la app abre sin señal. Sube CACHE cuando cambies archivos. */
-const CACHE = 'salida-vin-v2.0.6';
+const CACHE = 'salida-vin-v2.0.6-1';
 const SHELL = ['./', 'index.html', 'app.js', 'config.js', 'manifest.json', 'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png'];
 const LIBS = ['https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js', 'https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js'];
 
@@ -23,7 +23,7 @@ self.addEventListener('fetch', e => {
   if (url.origin !== location.origin) return;
   // Archivos de la app: red primero (para recibir actualizaciones), caché si no hay señal
   e.respondWith(
-    fetch(req).then(r => { if (r.ok) { const cp = r.clone(); caches.open(CACHE).then(c => c.put(req, cp)); } return r; })
+    fetch(req.url, { cache: 'no-cache', credentials: 'same-origin' }).then(r => { if (r.ok) { const cp = r.clone(); caches.open(CACHE).then(c => c.put(req, cp)); } return r; })
       .catch(() => caches.match(req, { ignoreSearch: true }).then(m => m || (req.mode === 'navigate' ? caches.match('index.html') : undefined)))
   );
 });
