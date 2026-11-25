@@ -4,7 +4,7 @@
    se guardan en el celular y se suben cuando vuelve la conexión. */
 (function () {
 'use strict';
-const VERSION = '2.0.3';
+const VERSION = '2.0.4';
 const CFG = window.CFG || {};
 const URL_ = (CFG.SUPABASE_URL || '').replace(/\/+$/, '');
 const KEY = CFG.SUPABASE_KEY || '';
@@ -494,6 +494,7 @@ $('file').onchange = async e => {
     try { const t = await api('settings?key=eq.templates&select=value'); if (t && t[0] && t[0].value) { TPL = t[0].value; lset('c:tpl', TPL); } } catch (e) {}
     const types = Object.keys(TPL).filter(k => !k.startsWith('__')); if (!types.length) types.push('Despacho');
     $('impType').innerHTML = types.map(t => '<option value="' + esc(t) + '">' + esc(tr(t)) + '</option>').join('');
+    if (types.includes('Despacho')) $('impType').value = 'Despacho';
     $('impA').hidden = !curId; open_('imp');
   } catch (err) { toast(tr('No se pudo leer el archivo')); }
 };
