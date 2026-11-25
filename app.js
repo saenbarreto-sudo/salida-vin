@@ -4,7 +4,7 @@
    se guardan en el celular y se suben cuando vuelve la conexión. */
 (function () {
 'use strict';
-const VERSION = '2.0.7';
+const VERSION = '2.1.0';
 const CFG = window.CFG || {};
 const URL_ = (CFG.SUPABASE_URL || '').replace(/\/+$/, '');
 const KEY = CFG.SUPABASE_KEY || '';
@@ -54,11 +54,364 @@ const EN = {
   'Hecho':'Done','Pendiente':'Pending','Abriendo cámara…':'Opening camera…','Apunta al código de barras del VIN':'Point at the VIN barcode',
   'No se pudo abrir la cámara. Revisa el permiso en Ajustes > Safari > Cámara.':"Couldn't open the camera. Check Settings > Safari > Camera.",
   'No está en esta lista':'Not in this list','Ver detalle':'Open','Casilla':'Checkbox','Código leído':'Code read','Fase':'Stage'
+,"Ver carros":"Show cars","Por fase":"By stage","Toca una fase para filtrar":"Tap a stage to filter","de":"of","Ya la tienen":"Already done","Les falta":"Still missing","Quitar":"Clear","Idioma":"Language","Mostrando {n} carros sin terminar":"Showing {n} unfinished cars","Mostrando {n} carros terminados":"Showing {n} finished cars","Mostrando los {n} carros":"Showing all {n} cars","{n} carros ya tienen {s}":"{n} cars already have {s}","A {n} carros les falta {s}":"{n} cars still need {s}"
 };
+const KO = {
+"Salida VIN": "VIN 출고",
+"Lista": "목록",
+"carros": "대",
+"terminados": "완료",
+"sin empezar": "시작 전",
+"Últimos 4 dígitos del VIN": "VIN 마지막 4자리",
+"⚡ Modo rápido": "⚡ 빠른 모드",
+"Apagado": "끔",
+"Escribe 4 dígitos (5 si hay dos iguales). Toca una fase para marcarla o desmarcarla; ⋯ para nota o foto. En modo rápido, Enter o el escáner marcan la fase elegida.": "4자리를 입력하세요(같은 번호가 두 개면 5자리). 단계를 눌러 표시하거나 해제하고, ⋯ 를 눌러 메모나 사진을 추가하세요. 빠른 모드에서는 Enter 또는 스캐너로 선택한 단계가 표시됩니다.",
+"Ver más": "더 보기",
+"Lista y respaldo": "목록 및 백업",
+"Exportar a Excel": "Excel로 내보내기",
+"Copiar resumen": "요약 복사",
+"🔒 Admin": "🔒 관리자",
+"🔓 Salir de admin": "🔓 관리자 종료",
+"Subir Excel": "Excel 업로드",
+"Fases de esta lista": "이 목록의 단계",
+"Columnas": "열",
+"Reiniciar lista": "목록 초기화",
+"Archivar lista": "목록 보관",
+"Desarchivar lista": "보관 해제",
+"Cancelar": "취소",
+"Sí": "예",
+"Guardar": "저장",
+"Cerrar": "닫기",
+"¿Cómo te llamas?": "이름이 무엇인가요?",
+"Se guarda en este celular y sale junto a lo que marques.": "이 휴대폰에 저장되며 표시한 항목 옆에 나타납니다.",
+"PIN de administrador": "관리자 PIN",
+"Entrar": "들어가기",
+"Columnas del Excel": "Excel 열",
+"Nombre de la lista": "목록 이름",
+"Tipo (plantilla de fases)": "유형(단계 템플릿)",
+"Agregar a la lista actual": "현재 목록에 추가",
+"Crear lista nueva": "새 목록 만들기",
+"Se pueden marcar en cualquier orden. Quitar una fase la oculta; lo ya marcado no se borra.": "단계는 순서 없이 표시할 수 있습니다. 단계를 삭제하면 숨겨지며, 이미 표시한 내용은 유지됩니다.",
+"+ Agregar fase": "+ 단계 추가",
+"Guardar también como plantilla de este tipo": "이 유형의 템플릿으로도 저장",
+"Columnas de esta lista": "이 목록의 열",
+"Nota": "메모",
+"📷 Agregar foto": "📷 사진 추가",
+"Historial": "기록",
+"Guardar nota": "메모 저장",
+"Escanear VIN": "VIN 스캔",
+"Falta configurar Supabase: abre config.js y pon SUPABASE_URL y SUPABASE_KEY.": "Supabase가 설정되지 않았습니다: config.js를 열고 SUPABASE_URL과 SUPABASE_KEY를 입력하세요.",
+"⛶ Pantalla completa": "⛶ 전체 화면",
+"✕ Salir": "✕ 나가기",
+"Conectando…": "연결 중…",
+"En vivo · compartido": "실시간 · 공유",
+"Sin conexión": "오프라인",
+"cambios por subir": "건 업로드 대기",
+"Sin configurar": "설정 안 됨",
+"Error del servidor": "서버 오류",
+"Escaneado": "스캔됨",
+"Llevado a carga": "충전 이동",
+"Washing": "세차",
+"Picking list": "피킹 리스트",
+"Inspeccionado": "검사 완료",
+"Destino": "목적지",
+"Modelo": "모델",
+"Color": "색상",
+"Ubicación": "위치",
+"Despacho": "출고",
+"Quick in / Quick out": "Quick in / Quick out",
+"Otra": "기타",
+"Archivadas": "보관됨",
+"(archivada)": "(보관됨)",
+"No hay ningún VIN que termine en": "끝자리가",
+"en esta lista.": "인 VIN이 이 목록에 없습니다.",
+"Hay": "총",
+"carros que terminan en": "대의 끝자리가",
+"Confirma con el VIN completo o escribe un dígito más.": "전체 VIN을 확인하거나 한 자리를 더 입력하세요.",
+"Toca para marcar": "눌러서 표시",
+"Todas las fases": "모든 단계",
+"Sin terminar": "미완료",
+"Terminados": "완료",
+"Sin empezar": "시작 전",
+"Todos": "전체",
+"Les falta": "남음",
+"La tienen": "완료",
+"Filtrar por…": "필터…",
+"Todos los valores": "모든 값",
+"No hay carros aquí.": "차량이 없습니다.",
+"Modo rápido": "빠른 모드",
+"cada VIN que confirmes (Enter o escáner) se marca en": "확인한 모든 VIN(Enter 또는 스캐너)이 다음으로 표시됩니다:",
+"Marcar": "표시",
+"ya estaba marcado": "이미 표시됨",
+"¿Desmarcar": "표시 해제:",
+"en": "·",
+"Desmarcado": "표시 해제됨",
+"Preparando Excel…": "Excel 준비 중…",
+"No se pudo cargar el lector de Excel; revisa la conexión": "Excel 도구를 불러오지 못했습니다. 연결을 확인하세요",
+"Excel listo": "Excel 준비 완료",
+"No se pudo descargar el Excel": "Excel을 다운로드하지 못했습니다",
+"Carros": "차량",
+"Resumen": "요약",
+"Exportado": "내보낸 시간",
+"Total": "합계",
+"fecha": "날짜",
+"hora": "시간",
+"por": "담당",
+"Fase": "단계",
+"Acción": "작업",
+"Fecha": "날짜",
+"Hora": "시간",
+"Persona": "담당자",
+"marcó": "표시함",
+"desmarcó": "해제함",
+"nota": "메모",
+"foto": "사진",
+"Terminados (todas las fases)": "완료(모든 단계)",
+"copiado": "복사됨",
+"No se pudo copiar": "복사하지 못했습니다",
+"No encontré ningún VIN en ese archivo": "이 파일에서 VIN을 찾지 못했습니다",
+"No se pudo leer el archivo": "파일을 읽지 못했습니다",
+"vehículos en la hoja": "대 (시트)",
+"VIN en la columna": "VIN 열:",
+"no están en la lista actual": "대는 현재 목록에 없음",
+"Ver en tarjeta": "카드에 표시",
+"Solo en detalle": "상세에만",
+"No guardar": "저장 안 함",
+"Columna": "열",
+"Lista creada": "목록이 생성되었습니다",
+"vehículos agregados": "대 추가됨",
+"No se pudo guardar; revisa la conexión": "저장하지 못했습니다. 연결을 확인하세요",
+"Lista nueva": "새 목록",
+"¿Desmarcar TODAS las fases de todos los carros de": "다음 목록의 모든 차량에서 모든 단계를 해제할까요:",
+"para todos? Los carros y el historial se mantienen.": "(모든 사용자에게 적용) 차량과 기록은 유지됩니다.",
+"Lista reiniciada": "목록이 초기화되었습니다",
+"¿Archivar": "보관할까요:",
+"? Sigue guardada y puedes consultarla en \"Archivadas\".": "? '보관됨'에서 계속 볼 수 있습니다.",
+"Lista archivada": "목록이 보관되었습니다",
+"Lista activa otra vez": "목록이 다시 활성화되었습니다",
+"PIN incorrecto": "PIN이 틀렸습니다",
+"Modo admin activado": "관리자 모드 켜짐",
+"Cambiar nombre": "이름 변경",
+"Este navegador no permite pantalla completa aquí": "이 브라우저에서는 전체 화면을 사용할 수 없습니다",
+"Hay una versión nueva; se actualizó": "새 버전이 설치되었습니다",
+"Borrar": "지우기",
+"Escanear código": "코드 스캔",
+"Clave de Supabase inválida (revisa config.js)": "Supabase 키가 올바르지 않습니다(config.js 확인)",
+"Fases guardadas": "단계가 저장되었습니다",
+"Columnas guardadas": "열이 저장되었습니다",
+"Fase nueva": "새 단계",
+"Subir": "위로",
+"Bajar": "아래로",
+"Quitar": "해제",
+"Nota guardada": "메모가 저장되었습니다",
+"Subiendo foto…": "사진 업로드 중…",
+"Foto guardada": "사진이 저장되었습니다",
+"No se pudo subir la foto": "사진을 업로드하지 못했습니다",
+"Las fotos necesitan conexión": "사진은 인터넷 연결이 필요합니다",
+"El historial necesita conexión": "기록은 인터넷 연결이 필요합니다",
+"Sin cambios todavía.": "아직 변경 사항이 없습니다.",
+"Hecho": "완료",
+"Pendiente": "대기",
+"Abriendo cámara…": "카메라 여는 중…",
+"Apunta al código de barras del VIN": "VIN 바코드를 비추세요",
+"No se pudo abrir la cámara. Revisa el permiso en Ajustes > Safari > Cámara.": "카메라를 열 수 없습니다. 설정 > Safari > 카메라를 확인하세요.",
+"No está en esta lista": "이 목록에 없음",
+"Ver detalle": "열기",
+"Casilla": "체크박스",
+"Código leído": "읽은 코드",
+"Ver carros": "차량 보기",
+"Por fase": "단계별",
+"Toca una fase para filtrar": "단계를 눌러 필터링",
+"de": "/",
+"Ya la tienen": "완료함",
+"Idioma": "언어",
+"Mostrando {n} carros sin terminar": "미완료 차량 {n}대",
+"Mostrando {n} carros terminados": "완료 차량 {n}대",
+"Mostrando los {n} carros": "전체 차량 {n}대",
+"{n} carros ya tienen {s}": "{s} 완료 차량 {n}대",
+"A {n} carros les falta {s}": "{s} 남은 차량 {n}대"
+};
+const ZH = {
+"Salida VIN": "VIN 出库",
+"Lista": "列表",
+"carros": "辆",
+"terminados": "已完成",
+"sin empezar": "未开始",
+"Últimos 4 dígitos del VIN": "VIN 后 4 位",
+"⚡ Modo rápido": "⚡ 快速模式",
+"Apagado": "关闭",
+"Escribe 4 dígitos (5 si hay dos iguales). Toca una fase para marcarla o desmarcarla; ⋯ para nota o foto. En modo rápido, Enter o el escáner marcan la fase elegida.": "输入 4 位数字（如有重复则输入 5 位）。点击阶段即可标记或取消标记；点 ⋯ 添加备注或照片。在快速模式下，按 Enter 或扫描即可标记所选阶段。",
+"Ver más": "显示更多",
+"Lista y respaldo": "列表与备份",
+"Exportar a Excel": "导出到 Excel",
+"Copiar resumen": "复制摘要",
+"🔒 Admin": "🔒 管理员",
+"🔓 Salir de admin": "🔓 退出管理员",
+"Subir Excel": "上传 Excel",
+"Fases de esta lista": "此列表的阶段",
+"Columnas": "列",
+"Reiniciar lista": "重置列表",
+"Archivar lista": "归档列表",
+"Desarchivar lista": "取消归档",
+"Cancelar": "取消",
+"Sí": "是",
+"Guardar": "保存",
+"Cerrar": "关闭",
+"¿Cómo te llamas?": "你叫什么名字？",
+"Se guarda en este celular y sale junto a lo que marques.": "保存在这部手机上，并显示在你标记的内容旁边。",
+"PIN de administrador": "管理员 PIN",
+"Entrar": "进入",
+"Columnas del Excel": "Excel 列",
+"Nombre de la lista": "列表名称",
+"Tipo (plantilla de fases)": "类型（阶段模板）",
+"Agregar a la lista actual": "添加到当前列表",
+"Crear lista nueva": "新建列表",
+"Se pueden marcar en cualquier orden. Quitar una fase la oculta; lo ya marcado no se borra.": "阶段可按任意顺序标记。删除阶段只会隐藏它，已标记的内容会保留。",
+"+ Agregar fase": "+ 添加阶段",
+"Guardar también como plantilla de este tipo": "同时保存为此类型的模板",
+"Columnas de esta lista": "此列表的列",
+"Nota": "备注",
+"📷 Agregar foto": "📷 添加照片",
+"Historial": "记录",
+"Guardar nota": "保存备注",
+"Escanear VIN": "扫描 VIN",
+"Falta configurar Supabase: abre config.js y pon SUPABASE_URL y SUPABASE_KEY.": "尚未设置 Supabase：请打开 config.js 并填写 SUPABASE_URL 和 SUPABASE_KEY。",
+"⛶ Pantalla completa": "⛶ 全屏",
+"✕ Salir": "✕ 退出",
+"Conectando…": "连接中…",
+"En vivo · compartido": "实时 · 共享",
+"Sin conexión": "离线",
+"cambios por subir": "条更改待上传",
+"Sin configurar": "未设置",
+"Error del servidor": "服务器错误",
+"Escaneado": "已扫描",
+"Llevado a carga": "已送充电",
+"Washing": "洗车",
+"Picking list": "拣货单",
+"Inspeccionado": "已检验",
+"Destino": "目的地",
+"Modelo": "车型",
+"Color": "颜色",
+"Ubicación": "位置",
+"Despacho": "发运",
+"Quick in / Quick out": "Quick in / Quick out",
+"Otra": "其他",
+"Archivadas": "已归档",
+"(archivada)": "（已归档）",
+"No hay ningún VIN que termine en": "此列表中没有以",
+"en esta lista.": "结尾的 VIN。",
+"Hay": "共有",
+"carros que terminan en": "辆车的尾号为",
+"Confirma con el VIN completo o escribe un dígito más.": "请核对完整 VIN 或多输入一位数字。",
+"Toca para marcar": "点击标记",
+"Todas las fases": "全部阶段",
+"Sin terminar": "未完成",
+"Terminados": "已完成",
+"Sin empezar": "未开始",
+"Todos": "全部",
+"Les falta": "未做",
+"La tienen": "已完成",
+"Filtrar por…": "筛选…",
+"Todos los valores": "全部值",
+"No hay carros aquí.": "这里没有车辆。",
+"Modo rápido": "快速模式",
+"cada VIN que confirmes (Enter o escáner) se marca en": "每个确认的 VIN（Enter 或扫描）都会标记为",
+"Marcar": "标记",
+"ya estaba marcado": "已经标记过",
+"¿Desmarcar": "取消标记",
+"en": "·",
+"Desmarcado": "已取消标记",
+"Preparando Excel…": "正在准备 Excel…",
+"No se pudo cargar el lector de Excel; revisa la conexión": "无法加载 Excel 工具，请检查网络连接",
+"Excel listo": "Excel 已就绪",
+"No se pudo descargar el Excel": "无法下载 Excel",
+"Carros": "车辆",
+"Resumen": "摘要",
+"Exportado": "导出时间",
+"Total": "合计",
+"fecha": "日期",
+"hora": "时间",
+"por": "操作人",
+"Fase": "阶段",
+"Acción": "操作",
+"Fecha": "日期",
+"Hora": "时间",
+"Persona": "人员",
+"marcó": "已标记",
+"desmarcó": "已取消",
+"nota": "备注",
+"foto": "照片",
+"Terminados (todas las fases)": "已完成（全部阶段）",
+"copiado": "已复制",
+"No se pudo copiar": "无法复制",
+"No encontré ningún VIN en ese archivo": "在该文件中找不到任何 VIN",
+"No se pudo leer el archivo": "无法读取文件",
+"vehículos en la hoja": "辆（工作表）",
+"VIN en la columna": "VIN 所在列：",
+"no están en la lista actual": "辆不在当前列表中",
+"Ver en tarjeta": "在卡片上显示",
+"Solo en detalle": "仅在详情中",
+"No guardar": "不保存",
+"Columna": "列",
+"Lista creada": "列表已创建",
+"vehículos agregados": "辆已添加",
+"No se pudo guardar; revisa la conexión": "无法保存，请检查网络连接",
+"Lista nueva": "新列表",
+"¿Desmarcar TODAS las fases de todos los carros de": "要为所有人取消以下列表中所有车辆的全部阶段吗：",
+"para todos? Los carros y el historial se mantienen.": "？车辆和记录会保留。",
+"Lista reiniciada": "列表已重置",
+"¿Archivar": "归档",
+"? Sigue guardada y puedes consultarla en \"Archivadas\".": "？之后仍可在“已归档”中查看。",
+"Lista archivada": "列表已归档",
+"Lista activa otra vez": "列表已重新启用",
+"PIN incorrecto": "PIN 错误",
+"Modo admin activado": "管理员模式已开启",
+"Cambiar nombre": "更改名字",
+"Este navegador no permite pantalla completa aquí": "此浏览器不支持全屏",
+"Hay una versión nueva; se actualizó": "已安装新版本",
+"Borrar": "清除",
+"Escanear código": "扫描条码",
+"Clave de Supabase inválida (revisa config.js)": "Supabase 密钥无效（请检查 config.js）",
+"Fases guardadas": "阶段已保存",
+"Columnas guardadas": "列已保存",
+"Fase nueva": "新阶段",
+"Subir": "上移",
+"Bajar": "下移",
+"Quitar": "清除",
+"Nota guardada": "备注已保存",
+"Subiendo foto…": "正在上传照片…",
+"Foto guardada": "照片已保存",
+"No se pudo subir la foto": "无法上传照片",
+"Las fotos necesitan conexión": "上传照片需要网络连接",
+"El historial necesita conexión": "查看记录需要网络连接",
+"Sin cambios todavía.": "暂无更改。",
+"Hecho": "已完成",
+"Pendiente": "待完成",
+"Abriendo cámara…": "正在打开相机…",
+"Apunta al código de barras del VIN": "对准 VIN 条码",
+"No se pudo abrir la cámara. Revisa el permiso en Ajustes > Safari > Cámara.": "无法打开相机。请检查 设置 > Safari > 相机。",
+"No está en esta lista": "不在此列表中",
+"Ver detalle": "打开",
+"Casilla": "复选框",
+"Código leído": "已读取的条码",
+"Ver carros": "查看车辆",
+"Por fase": "按阶段",
+"Toca una fase para filtrar": "点击阶段进行筛选",
+"de": "/",
+"Ya la tienen": "已做",
+"Idioma": "语言",
+"Mostrando {n} carros sin terminar": "显示 {n} 辆未完成车辆",
+"Mostrando {n} carros terminados": "显示 {n} 辆已完成车辆",
+"Mostrando los {n} carros": "显示全部 {n} 辆车",
+"{n} carros ya tienen {s}": "已完成 {s} 的车辆：{n} 辆",
+"A {n} carros les falta {s}": "尚未完成 {s} 的车辆：{n} 辆"
+};
+const DICT = { en: EN, ko: KO, zh: ZH };
 let lang = 'es';
-try { lang = localStorage.getItem('lang') || ((navigator.language || '').toLowerCase().startsWith('es') ? 'es' : 'en'); } catch (e) {}
-const tr = s => (lang === 'en' && EN[s] !== undefined) ? EN[s] : s;
-const LOC = () => lang === 'en' ? 'en-AU' : 'es';
+try { const nl = (navigator.language || '').toLowerCase().slice(0, 2); lang = localStorage.getItem('lang') || (['es', 'ko', 'zh'].includes(nl) ? nl : 'en'); } catch (e) {}
+if (!['es', 'en', 'ko', 'zh'].includes(lang)) lang = 'es';
+const tr = s => { if (lang === 'es') return s; const D = DICT[lang]; return (D && D[s] !== undefined) ? D[s] : (EN[s] !== undefined ? EN[s] : s); };
+const LOC = () => ({ en: 'en-AU', ko: 'ko-KR', zh: 'zh-CN' })[lang] || 'es';
 
 /* ======================= utilidades ======================= */
 const LS = (() => { try { const t = '__t'; localStorage.setItem(t, t); localStorage.removeItem(t); return localStorage; } catch (e) { return null; } })();
@@ -251,25 +604,45 @@ function fillQuick() {
 }
 function fillFilters() {
   const S = STAGES(), C = COLS();
-  $('fstage').innerHTML = '<option value="">' + esc(tr('Todas las fases')) + '</option>' + S.map(s => '<option value="' + esc(s.id) + '">' + esc(tr(s.label)) + '</option>').join('');
   if (fstage && !S.some(s => s.id === fstage)) fstage = '';
-  $('fstage').value = fstage;
-  const modes = fstage ? [['has', 'La tienen'], ['missing', 'Les falta'], ['all', 'Todos']] : [['unfinished', 'Sin terminar'], ['finished', 'Terminados'], ['none', 'Sin empezar'], ['all', 'Todos']];
-  if (!modes.some(m => m[0] === fmode)) fmode = modes[0][0];
-  $('fmode').innerHTML = modes.map(m => '<option value="' + m[0] + '">' + esc(tr(m[1])) + '</option>').join(''); $('fmode').value = fmode;
-  $('fcol').innerHTML = '<option value="">' + esc(tr('Filtrar por…')) + '</option>' + C.map(c => '<option value="' + esc(c.key) + '">' + esc(tr(c.label)) + '</option>').join('');
-  if (fcol && !C.some(c => c.key === fcol)) fcol = '';
-  $('fcol').value = fcol;
-  const vals = fcol ? [...new Set(VEH.map(x => String(x[fcol] == null ? '' : x[fcol])))].filter(Boolean).sort() : [];
-  if (fval && !vals.includes(fval)) fval = '';
-  $('fval').innerHTML = '<option value="">' + esc(tr('Todos los valores')) + '</option>' + vals.map(v => '<option value="' + esc(v) + '">' + esc(v) + '</option>').join('');
-  $('fval').value = fval; $('fval').disabled = !fcol;
+  if (fstage ? !['has', 'missing'].includes(fmode) : !['unfinished', 'finished', 'all'].includes(fmode)) fmode = fstage ? 'has' : 'unfinished';
+  if (fcol && !colChoices().some(o => o.c.key === fcol && o.vals.includes(fval))) { fcol = ''; fval = ''; }
+  void C;
+}
+const cval = (x, k) => String(x[k] == null ? '' : x[k]).trim();
+function colChoices() {
+  return COLS().filter(c => c.show !== 'no').map(c => ({ c, vals: [...new Set(VEH.map(x => cval(x, c.key)))].filter(Boolean).sort() }))
+    .filter(o => o.vals.length >= 2 && o.vals.length <= 40 && o.vals.length < VEH.length).slice(0, 3);
+}
+function fgOn(c) { const n = parseInt(okColor(c).slice(1), 16); return (0.299 * (n >> 16) + 0.587 * (n >> 8 & 255) + 0.114 * (n & 255)) > 160 ? '#141714' : '#fff'; }
+function abbrs() {
+  const S = STAGES(), AB = {}, clean = s => tr(s.label).replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ0-9]/g, '').toUpperCase() || tr(s.label).slice(0, 2);
+  S.forEach(s => { const c = clean(s), one = c.slice(0, 1); AB[s.id] = S.filter(o => clean(o).slice(0, 1) === one).length > 1 ? c.slice(0, 2) : one; });
+  return AB;
+}
+function drawFilters(shown) {
+  const S = STAGES(), n = S.length, AB = abbrs(), base = (fcol && fval) ? VEH.filter(x => cval(x, fcol) === fval) : VEH;
+  let fin = 0; const cnt = {}; S.forEach(s => cnt[s.id] = 0);
+  for (const x of base) { let k = 0; for (const s of S) if (done(x.vin, s.id)) { cnt[s.id]++; k++; } if (n && k === n) fin++; }
+  const tot = base.length;
+  $('seg').innerHTML = [['unfinished', 'Sin terminar', tot - fin], ['finished', 'Terminados', fin], ['all', 'Todos', tot]].map(m => '<button type="button" data-seg="' + m[0] + '" aria-pressed="' + (!fstage && fmode === m[0]) + '">' + esc(tr(m[1])) + '<b>' + m[2] + '</b></button>').join('');
+  $('cards').innerHTML = S.map(s => { const c = okColor(s.color), p = tot ? Math.round(cnt[s.id] / tot * 100) : 0;
+    return '<button type="button" class="card" data-card="' + esc(s.id) + '" aria-pressed="' + (fstage === s.id) + '" style="--c:' + c + ';--f:' + fgOn(c) + '"><span class="t"><span class="l" aria-hidden="true">' + esc(AB[s.id]) + '</span>' + esc(tr(s.label)) + '</span><span class="n">' + cnt[s.id] + ' <small>' + esc(tr('de')) + ' ' + tot + '</small></span><span class="bar"><i style="width:' + p + '%"></i></span></button>'; }).join('');
+  const st = S.find(s => s.id === fstage), hm = $('hm'); hm.hidden = !st;
+  if (st) { const c = okColor(st.color); hm.style.setProperty('--c', c); hm.style.setProperty('--f', fgOn(c));
+    hm.innerHTML = '<button type="button" data-hm="has" aria-pressed="' + (fmode === 'has') + '">✓ ' + esc(tr('Ya la tienen')) + ' · ' + cnt[st.id] + '</button><button type="button" data-hm="missing" aria-pressed="' + (fmode === 'missing') + '">' + esc(tr('Les falta')) + ' · ' + (tot - cnt[st.id]) + '</button>'; }
+  $('cf').innerHTML = colChoices().map(o => '<div class="cf"><span>' + esc(tr(o.c.label)) + '</span><button type="button" data-cf="' + esc(o.c.key) + '" data-cv="" aria-pressed="' + !(fcol === o.c.key && fval) + '">' + esc(tr('Todos')) + '</button>'
+    + o.vals.map(v => '<button type="button" data-cf="' + esc(o.c.key) + '" data-cv="' + esc(v) + '" aria-pressed="' + (fcol === o.c.key && fval === v) + '">' + esc(v) + '</button>').join('') + '</div>').join('');
+  let msg = st ? tr(fmode === 'has' ? '{n} carros ya tienen {s}' : 'A {n} carros les falta {s}') : tr(fmode === 'finished' ? 'Mostrando {n} carros terminados' : fmode === 'all' ? 'Mostrando los {n} carros' : 'Mostrando {n} carros sin terminar');
+  msg = esc(msg).replace('{n}', '<b>' + shown + '</b>').replace('{s}', '<b>' + esc(st ? tr(st.label) : '') + '</b>');
+  const fc = fcol && fval ? COLS().find(c => c.key === fcol) : null;
+  if (fc) msg += ' · ' + esc(tr(fc.label)) + ': <b>' + esc(fval) + '</b>';
+  $('sum').innerHTML = '<span>' + msg + '</span>' + ((st || fc || fmode !== 'unfinished') ? '<button type="button" data-clr="1">✕ ' + esc(tr('Quitar')) + '</button>' : '');
 }
 function stats() {
   const S = STAGES(); let fin = 0, none = 0; const cnt = {}; S.forEach(s => cnt[s.id] = 0);
   for (const x of VEH) { let k = 0; for (const s of S) if (done(x.vin, s.id)) { cnt[s.id]++; k++; } if (S.length && k === S.length) fin++; if (!k) none++; }
   $('sTot').textContent = VEH.length; $('sDone').textContent = fin; $('sNone').textContent = none;
-  $('chips').innerHTML = S.map(s => '<button class="chip" data-chip="' + esc(s.id) + '" aria-pressed="' + (fstage === s.id) + '">' + esc(tr(s.label)) + '<b>' + cnt[s.id] + '</b></button>').join('');
 }
 function fieldTags(x, mode) {
   return COLS().filter(c => mode === 'all' ? c.show !== 'no' : c.show === 'card').map(c => x[c.key] ? '<span class="tag"><b>' + esc(tr(c.label)) + '</b>' + esc(x[c.key]) + '</span>' : '').join(' ');
@@ -300,7 +673,7 @@ function search() {
 }
 function filtered() {
   return VEH.filter(x => {
-    if (fcol && fval && String(x[fcol] == null ? '' : x[fcol]) !== fval) return false;
+    if (fcol && fval && cval(x, fcol) !== fval) return false;
     if (fstage) { const d = done(x.vin, fstage); return fmode === 'all' || (fmode === 'has' ? d : !d); }
     if (fmode === 'all') return true;
     const k = nDone(x.vin), n = STAGES().length;
@@ -311,9 +684,8 @@ function render() {
   stats(); search();
   let Lx = filtered();
   if (fstage && fmode === 'has') Lx.sort((a, b) => (MARKS[b.vin][fstage].t || 0) - (MARKS[a.vin][fstage].t || 0));
-  const S = STAGES(), sh = Lx.slice(0, limit), AB = {};
-  const clean = s => tr(s.label).replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ0-9]/g, '').toUpperCase();
-  S.forEach(s => { const c = clean(s), one = c.slice(0, 1); AB[s.id] = S.filter(o => clean(o).slice(0, 1) === one).length > 1 ? c.slice(0, 2) : one; });
+  drawFilters(Lx.length);
+  const S = STAGES(), sh = Lx.slice(0, limit), AB = abbrs();
   $('list').innerHTML = sh.length ? sh.map(x => {
     const sub = COLS().filter(c => c.show === 'card' && x[c.key]).map(c => x[c.key]).join(' · ');
     return '<li class="' + (finished(x.vin) ? 'done' : '') + '"><button class="grow open" data-open="' + esc(x.vin) + '" aria-label="' + esc(tr('Ver detalle')) + ' ' + esc(x.vin) + '"><span class="vin">' + vinH(x.vin) + '</span>' + (sub ? '<span class="sub2">' + esc(sub) + '</span>' : '') + '</button><div class="sq">'
@@ -330,7 +702,11 @@ document.body.addEventListener('click', e => {
   else if (d.l && d.v) toggle(d.v, d.l, true);
   else if (d.d && d.v) openDetail(d.v, d.d);
   else if (d.open) { let n = 4; while (n < d.open.length && VEH.filter(x => x.vin.endsWith(d.open.slice(-n))).length > 1) n++; $('q').value = d.open.slice(-n); search(); $('q').closest('.pad').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
-  else if (d.chip) { fstage = fstage === d.chip ? '' : d.chip; fmode = fstage ? 'has' : 'unfinished'; limit = 60; fillFilters(); render(); $('list').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  else if (d.seg) { fstage = ''; fmode = d.seg; limit = 60; render(); }
+  else if (d.card) { if (fstage === d.card) { fstage = ''; fmode = 'unfinished'; } else { fstage = d.card; fmode = 'has'; } limit = 60; render(); }
+  else if (d.hm) { fmode = d.hm; limit = 60; render(); }
+  else if (d.cf !== undefined) { fcol = d.cv ? d.cf : ''; fval = d.cv || ''; limit = 60; render(); }
+  else if (d.clr) { fstage = ''; fmode = 'unfinished'; fcol = ''; fval = ''; limit = 60; render(); }
 });
 function quickMark(x) {
   const s = STAGES().find(z => z.id === quick); if (!s || !x) return false;
@@ -342,10 +718,6 @@ $('q').addEventListener('input', () => search());
 $('q').addEventListener('keydown', e => { if (e.key === 'Enter') { const m = search(); if (m.length === 1 && quick) { quickMark(m[0]); $('q').value = ''; search(); } } });
 $('clr').onclick = () => { $('q').value = ''; search(); $('q').focus(); };
 $('qsel').onchange = e => { quick = e.target.value; fillQuick(); search(); };
-$('fstage').onchange = e => { fstage = e.target.value; fmode = fstage ? 'has' : 'unfinished'; limit = 60; fillFilters(); render(); };
-$('fmode').onchange = e => { fmode = e.target.value; limit = 60; render(); };
-$('fcol').onchange = e => { fcol = e.target.value; fval = ''; limit = 60; fillFilters(); render(); };
-$('fval').onchange = e => { fval = e.target.value; limit = 60; render(); };
 $('more').onclick = () => { limit += 100; render(); };
 $('lsel').onchange = e => { $('q').value = ''; quick = ''; openList(e.target.value); };
 
@@ -642,16 +1014,16 @@ $('who').onclick = askName;
   d.addEventListener('fullscreenchange', window.__fsUpd); d.addEventListener('webkitfullscreenchange', window.__fsUpd);
 })();
 const TN = [];
-(function walk(n) { for (const c of n.childNodes) { if (c.nodeType === 3) { const t = c.nodeValue.trim(); if (t && EN[t] !== undefined) TN.push([c, c.nodeValue, t]); } else if (c.nodeType === 1 && !/^(SCRIPT|STYLE|SELECT|UL)$/.test(c.tagName) && !['res', 'list', 'sync', 'lname', 'who', 'adm', 'fs', 'lng', 'arch', 'chips', 'qban', 'impMap', 'impInfo', 'feList', 'ceList', 'sdT', 'sdS', 'sdP', 'hiT', 'camS', 'dlgT'].includes(c.id)) walk(c); } })(document.body);
+(function walk(n) { for (const c of n.childNodes) { if (c.nodeType === 3) { const t = c.nodeValue.trim(); if (t && EN[t] !== undefined) TN.push([c, c.nodeValue, t]); } else if (c.nodeType === 1 && !/^(SCRIPT|STYLE|SELECT|UL)$/.test(c.tagName) && !['res', 'list', 'sync', 'lname', 'who', 'adm', 'fs', 'lng', 'arch', 'seg', 'cards', 'hm', 'cf', 'sum', 'qban', 'impMap', 'impInfo', 'feList', 'ceList', 'sdT', 'sdS', 'sdP', 'hiT', 'camS', 'dlgT'].includes(c.id)) walk(c); } })(document.body);
 function applyLang() {
-  document.documentElement.lang = lang;
-  for (const [n, orig, t] of TN) n.nodeValue = lang === 'en' ? orig.replace(t, EN[t]) : orig;
-  $('lng').textContent = lang === 'en' ? 'ES' : 'EN'; $('lng').setAttribute('aria-label', lang === 'en' ? 'Cambiar a español' : 'Switch to English');
+  document.documentElement.lang = lang === 'zh' ? 'zh-Hans' : lang;
+  for (const [n, orig, t] of TN) n.nodeValue = lang === 'es' ? orig : orig.replace(t, tr(t));
+  $('lng').value = lang; $('lng').setAttribute('aria-label', tr('Idioma'));
   $('clr').setAttribute('aria-label', tr('Borrar')); $('camb').setAttribute('aria-label', tr('Escanear código')); document.title = tr('Salida VIN');
   if (window.__fsUpd) window.__fsUpd(); else $('fs').textContent = tr('⛶ Pantalla completa');
   adminUI(); whoUI(); fillLists(); fillQuick(); fillFilters(); render(); syncUI();
 }
-$('lng').onclick = () => { lang = lang === 'en' ? 'es' : 'en'; try { localStorage.setItem('lang', lang); } catch (e) {} applyLang(); };
+$('lng').onchange = () => { lang = $('lng').value; try { localStorage.setItem('lang', lang); } catch (e) {} applyLang(); };
 
 /* ======================= arranque ======================= */
 $('ver').textContent = 'v' + VERSION;
