@@ -4,7 +4,7 @@
    se guardan en el celular y se suben cuando vuelve la conexión. */
 (function () {
 'use strict';
-const VERSION = '2.0.1';
+const VERSION = '2.0.2';
 const CFG = window.CFG || {};
 const URL_ = (CFG.SUPABASE_URL || '').replace(/\/+$/, '');
 const KEY = CFG.SUPABASE_KEY || '';
@@ -191,7 +191,7 @@ function applyRows(rows) {
 }
 async function pullLists() {
   const rows = await api('lists?select=id,name,type,archived,columns,stages,created_at,updated_at&order=created_at.desc');
-  LISTS = rows || []; lset('c:lists', LISTS);
+  LISTS = rows || []; lset('c:lists', LISTS); synced = true;
   const t = await api('settings?key=eq.templates&select=value'); if (t && t[0] && t[0].value) { TPL = t[0].value; lset('c:tpl', TPL); }
   if (!L()) { const a = LISTS.find(l => !l.archived) || LISTS[0]; if (a) await openList(a.id, true); }
   fillLists(); fillQuick(); fillFilters(); render();
