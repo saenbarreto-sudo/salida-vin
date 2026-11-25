@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Salida VIN</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#ff5a1f">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Salida VIN">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" href="icons/icon-192.png">
+<style>:root{color-scheme:light dark;--bg:light-dark(#f3f4f1,#111312);--card:light-dark(#fff,#1b1e1c);--ink:light-dark(#141714,#eef0ec);--mut:light-dark(#5d645e,#9ba39c);--line:light-dark(#dfe2dc,#2c312d);--or:#ff5a1f;--orInk:#fff;--ok:light-dark(#17803f,#3cc46e);--okBg:light-dark(#e6f4ea,#173222);--warn:light-dark(#8a5a00,#f2c15a);--warnBg:light-dark(#fff4d6,#33290f);--ch:light-dark(#1d5fd6,#6ea2ff);--chBg:light-dark(#e7effd,#17233a)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Inter,system-ui,sans-serif;overflow-x:clip}
+.d{font-family:"Barlow Semi Condensed",Inter,sans-serif}
+header{background:var(--or);color:var(--orInk);padding:18px max(4vw,16px) 22px}
+.hw{max-width:860px;margin:0 auto}
+h1{font:600 clamp(30px,6vw,44px)/1.05 "Barlow Semi Condensed",sans-serif;margin:0;text-wrap:balance}
+.sub{margin:4px 0 14px;opacity:.92;font-size:15px}
+.meter{height:12px;background:rgba(255,255,255,.3);border-radius:6px;overflow:hidden}
+.meter{display:flex}.meter i{display:block;height:100%;background:#fff;width:0;transition:width .4s}.meter i+i{background:#1d5fd6}
+.stats{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:8px;font-size:15px}
+.stats b{font:600 22px/1 "Barlow Semi Condensed",sans-serif}
+main{max-width:860px;margin:0 auto;padding:0 max(4vw,16px) 60px}
+.pad{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-top:-10px;position:relative;box-shadow:0 6px 24px rgba(0,0,0,.08)}
+label{font-size:14px;color:var(--mut)}
+.inp{display:flex;gap:8px;margin-top:6px}
+#q{flex:1;font:600 clamp(36px,10vw,54px)/1 "Barlow Semi Condensed",sans-serif;letter-spacing:.12em;padding:8px 14px;border:2px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);width:100%}
+#q:focus{outline:none;border-color:var(--or)}
+button{font:600 16px Inter,sans-serif;min-height:44px;padding:0 16px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+button:focus-visible,.tab:focus-visible{outline:3px solid var(--or);outline-offset:2px}
+.pri{background:var(--or);border-color:var(--or);color:#fff}
+.hint{font-size:14px;color:var(--mut);margin:10px 0 0}
+#res{margin-top:12px;display:grid;gap:10px}
+.hit{border:2px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px}
+.hit.done{border-color:var(--ok);background:var(--okBg)}
+.vin{font:500 20px/1.2 "Barlow Semi Condensed",sans-serif;letter-spacing:.04em;overflow-wrap:anywhere}
+.vin em{font-style:normal;font-weight:700;color:var(--or);font-size:1.35em}
+.hit.done .vin em{color:var(--ok)}.hit.chg{border-color:var(--ch);background:var(--chBg)}.hit.chg .vin em{color:var(--ch)}.blu{background:var(--ch);border-color:var(--ch);color:#fff}.cht{color:var(--ch);font-weight:600;font-size:14px}.btns{display:flex;flex-wrap:wrap;gap:8px}
+.grow{flex:1 1 220px}
+.tag{display:inline-block;font:600 13px Inter,sans-serif;padding:2px 8px;border-radius:6px;background:var(--bg);border:1px solid var(--line);margin-top:4px;white-space:nowrap}
+.okt{color:var(--ok);font-weight:600;font-size:14px}
+.note{background:var(--warnBg);color:var(--warn);border-radius:10px;padding:8px 12px;font-size:14px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:24px 0 10px}
+.tab{min-height:44px;padding:0 14px;border-radius:22px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:600 15px Inter,sans-serif;cursor:pointer}
+.tab[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sp{flex:1}
+select{font:16px Inter,sans-serif;min-height:44px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:0 10px}
+ul{list-style:none;margin:0;padding:0;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+li{display:flex;align-items:center;gap:12px;padding:8px 12px;border-top:1px solid var(--line)}
+li:first-child{border-top:0}
+.ck{width:44px;height:44px;flex:none;border-radius:10px;border:2px solid var(--line);background:var(--bg);display:grid;place-items:center;padding:0}
+.ck svg{width:22px;height:22px;stroke:#fff;stroke-width:3;fill:none;opacity:0}
+li.done .ck{background:var(--ok);border-color:var(--ok)}li.done .ck svg{opacity:1}.cg{width:44px;height:44px;flex:none;border-radius:10px;border:2px solid var(--line);background:var(--bg);display:grid;place-items:center;padding:0}.cg svg{width:22px;height:22px;fill:var(--mut)}li.chg .cg{background:var(--ch);border-color:var(--ch)}li.chg .cg svg{fill:#fff}li.chg .vin em{color:var(--ch)}li.done .vin em{color:var(--ok)}
+li .vin{font-size:18px}li .vin em{font-size:1.25em}
+.tm{font-size:13px;color:var(--mut);white-space:nowrap}
+.empty{padding:22px;text-align:center;color:var(--mut)}
+.more{display:block;margin:10px auto 0}
+.tools{margin-top:30px;border-top:1px solid var(--line);padding-top:18px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tools p{flex-basis:100%;margin:0 0 4px;font-size:14px;color:var(--mut)}
+#toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:15px;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90vw}
+#toast.on{opacity:1}
+#dlg{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;place-items:center;padding:16px;z-index:5}
+#dlg.on{display:grid}
+#dlg div{background:var(--card);border-radius:14px;padding:18px;max-width:380px}
+#dlg p{margin:0 0 14px}
+.row{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+#sync{font-size:13px;opacity:.9}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+@media(max-width:600px){li{padding:6px 8px;gap:8px}.vin{font-size:18px}li .vin{font-size:15px;letter-spacing:0}li .vin em{font-size:1.3em}li .tag{font-size:12px;padding:2px 5px}.ck,.cg{width:40px;height:44px}}.vin em{white-space:nowrap}
+#fs{float:right;margin:2px 0 8px 10px;background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.55);color:#fff;font-size:14px;padding:0 12px}#fs[hidden]{display:none}li .tm{flex:none;font-size:12px;line-height:1.3}li .grow{overflow:hidden}.lbar{display:flex;align-items:center;gap:8px;margin:0 0 12px}.lbar label{color:#fff;opacity:.9;font-size:14px}.lbar select{flex:1;background:rgba(255,255,255,.95);color:#141714;border:0;font-weight:600}#nl{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;place-items:center;padding:16px;z-index:6}#nl.on{display:grid}#nl>div{background:var(--card);border-radius:14px;padding:18px;max-width:400px;width:100%;display:grid;gap:12px}#nl p{margin:0}#nl label{display:grid;gap:4px}#nl input{font:16px Inter,sans-serif;min-height:44px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:0 10px}#nl .row{margin-top:4px}[hidden]{display:none!important}#lng{float:right;margin:2px 0 8px 8px;background:#fff;border-color:#fff;color:#ff5a1f;font-weight:700;padding:0 12px;min-width:48px}
+html{background:#ff5a1f}body{min-height:100vh;min-height:100dvh;-webkit-tap-highlight-color:transparent;padding-bottom:env(safe-area-inset-bottom)}
+header{padding:calc(14px + env(safe-area-inset-top)) max(4vw,16px) 18px}
+.top{display:flex;align-items:flex-start;gap:8px}.top h1{flex:1}
+.hb{min-height:40px;padding:0 12px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.55);color:#fff;font-size:14px;border-radius:10px}
+#lng{background:#fff;border-color:#fff;color:#c2410c;font-weight:700;min-width:48px}
+@media (display-mode:standalone){#fs{display:none!important}}
+.lbar{display:flex;align-items:center;gap:8px;margin:0 0 10px}.lbar label{color:#fff;opacity:.9;font-size:14px}.lbar select{flex:1;background:rgba(255,255,255,.96);color:#141714;border:0;font-weight:600}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#fff;margin-right:6px;vertical-align:middle}.dot.off{background:#ffd34d}.dot.err{background:#1b1e1c}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.chip{min-height:34px;padding:0 10px;border-radius:999px;border:0;background:rgba(255,255,255,.22);color:#fff;font:600 13px Inter,system-ui,sans-serif}
+.chip b{font:700 15px "Barlow Semi Condensed",sans-serif;margin-left:4px}
+.chip[aria-pressed=true]{background:#fff;color:#141714}
+.qm{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px}
+.qm label{font-size:13px;color:var(--mut)}
+.qm select{flex:1;min-width:150px}
+.qbanner{margin-top:10px;border-radius:10px;padding:8px 12px;font-size:14px;font-weight:600;color:#fff}
+.cam{width:56px;flex:none;padding:0;display:grid;place-items:center}
+.stg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:4px;width:100%}
+.sb{min-height:60px;border-radius:12px;border:2px dashed var(--c);background:var(--card);color:var(--c);text-align:left;padding:6px 10px;display:flex;flex-direction:column;justify-content:center;gap:2px;font:700 15px Inter,system-ui,sans-serif;position:relative}
+.sb small{font:500 12px Inter,system-ui,sans-serif;color:var(--mut)}
+.sb.on{border-style:solid;background:var(--c);color:#fff}.sb.on small{color:rgba(255,255,255,.9)}
+.sb{width:100%;padding-right:40px}.sbw:last-child:nth-child(odd){grid-column:span 2}
+.sx{position:absolute;top:4px;right:4px;width:34px;height:34px;min-height:0;padding:0;border-radius:8px;border:0;background:transparent;color:inherit;font-size:18px;line-height:1}
+.hit{flex-direction:column;align-items:stretch}
+.fields{display:flex;flex-wrap:wrap;gap:6px}
+.tag b{font-weight:700;margin-right:4px}
+.sq{display:flex;gap:4px;flex:none}
+.sq button{width:28px;height:28px;min-height:0;padding:0;border-radius:7px;border:2px dashed var(--c);background:transparent;color:var(--c);font:700 11px Inter,sans-serif}
+.sq button.on{border-style:solid;background:var(--c);color:#fff}
+li{flex-wrap:wrap}li .grow{min-width:150px}.sub2{font-size:12px;color:var(--mut)}
+.filt{display:flex;gap:6px;flex-wrap:wrap;margin:16px 0 10px}.filt select{flex:1;min-width:140px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;place-items:center;padding:12px;z-index:6}.modal.on{display:grid}
+.modal>div{background:var(--card);color:var(--ink);border-radius:14px;padding:16px;max-width:460px;width:100%;max-height:calc(100dvh - 24px);overflow:auto;display:grid;gap:12px}
+.modal p{margin:0}.modal label{display:grid;gap:4px;font-size:14px}
+.modal input,.modal select,.modal textarea{font:16px Inter,system-ui,sans-serif;min-height:44px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:0 10px}
+.modal textarea{padding:8px 10px;min-height:80px}
+.row{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+#dlg.on{display:grid}#dlg .row{padding:0;background:none;max-width:none}
+.map{display:grid;gap:6px}.mapr{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:6px;align-items:center;border-top:1px solid var(--line);padding-top:6px}
+.mapr small{display:block;color:var(--mut);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mapr input,.mapr select{min-height:40px;font-size:15px}
+.fe{display:grid;grid-template-columns:36px minmax(0,1fr) 44px 40px 40px;gap:6px;align-items:center}
+.fe input[type=color]{padding:0;width:44px;height:40px;border-radius:8px}
+.fe button{min-height:40px;padding:0}
+.hist{list-style:none;margin:0;padding:0;border:0;display:grid;gap:6px;max-height:50vh;overflow:auto}.hist li{border:0;padding:6px 0;border-top:1px solid var(--line);font-size:14px;display:block}
+.ph{max-width:100%;border-radius:10px}
+#camv{width:100%;max-height:55vh;background:#000;border-radius:12px;object-fit:cover}
+.foot{margin-top:18px;font-size:13px;color:var(--mut);display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center}
+.link{background:none;border:0;min-height:36px;padding:0;color:var(--mut);text-decoration:underline;font:inherit}
+.cfg{background:var(--warnBg);color:var(--warn);padding:14px;border-radius:12px;margin-top:14px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<header><div class="hw">
+  <div class="top"><h1 id="ttl">Salida VIN</h1><button id="fs" class="hb" type="button">⛶ Pantalla completa</button><button id="lng" class="hb" type="button">EN</button></div>
+  <p class="sub"><span id="lname"></span> · <span class="dot" id="dot"></span><span id="sync">Conectando…</span></p>
+  <div id="lbar" class="lbar" hidden><label for="lsel">Lista</label><select id="lsel"></select></div>
+  <div class="stats"><span><b id="sTot">0</b> carros</span><span><b id="sDone">0</b> terminados</span><span><b id="sNone">0</b> sin empezar</span></div>
+  <div class="chips" id="chips"></div>
+</div></header>
+<main>
+<div id="cfg" class="cfg" hidden>Falta configurar Supabase: abre config.js y pon SUPABASE_URL y SUPABASE_KEY.</div>
+<section class="pad"><label for="q">Últimos 4 dígitos del VIN</label>
+  <div class="inp"><input id="q" inputmode="numeric" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" maxlength="17" placeholder="0000" enterkeyhint="done"><button id="clr" aria-label="Borrar">✕</button><button id="camb" class="cam" aria-label="Escanear código"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 8v8M10 8v8M13 8v8M17 8v8"/></svg></button></div>
+  <div class="qm"><label for="qsel">⚡ Modo rápido</label><select id="qsel"></select></div>
+  <div id="qban" class="qbanner" hidden></div>
+  <p class="hint">Escribe 4 dígitos (5 si hay dos iguales). Toca una fase para marcarla o desmarcarla; ⋯ para nota o foto. En modo rápido, Enter o el escáner marcan la fase elegida.</p>
+  <div id="res" aria-live="polite"></div></section>
+<div class="filt"><select id="fstage" aria-label="Fase"></select><select id="fmode" aria-label="Mostrar"></select></div>
+<div class="filt" style="margin-top:0"><select id="fcol" aria-label="Columna"></select><select id="fval" aria-label="Valor"></select></div>
+<ul id="list"></ul><button id="more" class="more">Ver más</button>
+<section class="tools"><p>Lista y respaldo</p>
+  <button id="xls" class="pri">Exportar a Excel</button><button id="copy">Copiar resumen</button>
+  <button id="adm">🔒 Admin</button>
+  <span id="admT" hidden><label class="tab" style="display:inline-grid;place-items:center" for="file">Subir Excel</label><input id="file" type="file" accept=".xlsx,.xls,.csv" hidden><button id="fases">Fases de esta lista</button><button id="cols">Columnas</button><button id="reset">Reiniciar lista</button><button id="arch">Archivar lista</button></span>
+</section>
+<div class="foot"><button id="who" class="link"></button><span id="ver"></span></div>
+</main>
+
+<div id="dlg" class="modal" role="dialog" aria-modal="true"><div><p id="dlgT"></p><div class="row"><button id="dlgN">Cancelar</button><button id="dlgY" class="pri">Sí</button></div></div></div>
+<div id="nm" class="modal" role="dialog" aria-modal="true"><div><p><b>¿Cómo te llamas?</b></p><p class="hint" style="margin:0">Se guarda en este celular y sale junto a lo que marques.</p><input id="nmI" maxlength="30" autocomplete="name"><div class="row"><button id="nmY" class="pri">Guardar</button></div></div></div>
+<div id="pin" class="modal" role="dialog" aria-modal="true"><div><p><b>PIN de administrador</b></p><input id="pinI" type="password" inputmode="numeric" maxlength="12"><div class="row"><button id="pinN">Cancelar</button><button id="pinY" class="pri">Entrar</button></div></div></div>
+<div id="imp" class="modal" role="dialog" aria-modal="true"><div>
+  <p><b>Columnas del Excel</b></p><p class="hint" id="impInfo" style="margin:0"></p>
+  <div class="map" id="impMap"></div>
+  <label>Nombre de la lista<input id="impName" maxlength="40"></label>
+  <label>Tipo (plantilla de fases)<select id="impType"></select></label>
+  <div class="row"><button id="impC">Cancelar</button><button id="impA">Agregar a la lista actual</button><button id="impY" class="pri">Crear lista nueva</button></div>
+</div></div>
+<div id="fe" class="modal" role="dialog" aria-modal="true"><div>
+  <p><b>Fases de esta lista</b></p><p class="hint" style="margin:0">Se pueden marcar en cualquier orden. Quitar una fase la oculta; lo ya marcado no se borra.</p>
+  <div class="map" id="feList"></div>
+  <button id="feAdd">+ Agregar fase</button>
+  <label style="display:flex;gap:8px;align-items:center;grid-template-columns:none"><input type="checkbox" id="feTpl" style="width:20px;min-height:20px">Guardar también como plantilla de este tipo</label>
+  <div class="row"><button id="feC">Cancelar</button><button id="feY" class="pri">Guardar</button></div>
+</div></div>
+<div id="ce" class="modal" role="dialog" aria-modal="true"><div>
+  <p><b>Columnas de esta lista</b></p><div class="map" id="ceList"></div>
+  <div class="row"><button id="ceC">Cancelar</button><button id="ceY" class="pri">Guardar</button></div>
+</div></div>
+<div id="sd" class="modal" role="dialog" aria-modal="true"><div>
+  <p><b id="sdT"></b></p><p class="hint" id="sdS" style="margin:0"></p>
+  <label>Nota<textarea id="sdN" maxlength="500"></textarea></label>
+  <div id="sdP"></div>
+  <label class="tab" style="display:inline-grid;place-items:center" for="sdF">📷 Agregar foto</label><input id="sdF" type="file" accept="image/*" capture="environment" hidden>
+  <div class="row"><button id="sdH">Historial</button><button id="sdC">Cerrar</button><button id="sdY" class="pri">Guardar nota</button></div>
+</div></div>
+<div id="hi" class="modal" role="dialog" aria-modal="true"><div>
+  <p><b id="hiT">Historial</b></p><ul class="hist" id="hiL"></ul>
+  <div class="row"><button id="hiC" class="pri">Cerrar</button></div>
+</div></div>
+<div id="cm" class="modal" role="dialog" aria-modal="true"><div>
+  <p><b>Escanear VIN</b></p><video id="camv" playsinline muted></video><p class="hint" id="camS" style="margin:0"></p>
+  <div class="row"><button id="camC" class="pri">Cerrar</button></div>
+</div></div>
+<div id="toast" role="status"></div>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
