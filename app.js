@@ -4,7 +4,7 @@
    se guardan en el celular y se suben cuando vuelve la conexión. */
 (function () {
 'use strict';
-const VERSION = '2.0.4';
+const VERSION = '2.0.5';
 const CFG = window.CFG || {};
 const URL_ = (CFG.SUPABASE_URL || '').replace(/\/+$/, '');
 const KEY = CFG.SUPABASE_KEY || '';
@@ -53,7 +53,7 @@ const EN = {
   'Las fotos necesitan conexión':'Photos need a connection','El historial necesita conexión':'History needs a connection','Sin cambios todavía.':'No changes yet.',
   'Hecho':'Done','Pendiente':'Pending','Abriendo cámara…':'Opening camera…','Apunta al código de barras del VIN':'Point at the VIN barcode',
   'No se pudo abrir la cámara. Revisa el permiso en Ajustes > Safari > Cámara.':"Couldn't open the camera. Check Settings > Safari > Camera.",
-  'No está en esta lista':'Not in this list','Casilla':'Checkbox','Código leído':'Code read','Fase':'Stage'
+  'No está en esta lista':'Not in this list','Ver detalle':'Open','Casilla':'Checkbox','Código leído':'Code read','Fase':'Stage'
 };
 let lang = 'es';
 try { lang = localStorage.getItem('lang') || ((navigator.language || '').toLowerCase().startsWith('es') ? 'es' : 'en'); } catch (e) {}
@@ -293,7 +293,7 @@ function search() {
   if (!m.length) { r.innerHTML = '<div class="note">' + esc(tr('No hay ningún VIN que termine en')) + ' ' + esc(q) + ' ' + esc(tr('en esta lista.')) + '</div>'; return m; }
   let h = m.length > 1 ? '<div class="note">' + esc(tr('Hay')) + ' ' + m.length + ' ' + esc(tr('carros que terminan en')) + ' ' + esc(q) + '. ' + esc(tr('Confirma con el VIN completo o escribe un dígito más.')) + '</div>' : '';
   const qs = STAGES().find(s => s.id === quick);
-  h += m.slice(0, 6).map(x => '<div class="hit' + (finished(x.vin) ? ' done' : '') + '"><div class="vin">' + vinH(x.vin, q.length) + '</div><div class="fields">' + fieldTags(x, 'all') + '</div>'
+  h += m.slice(0, 6).map(x => '<div class="hit' + (finished(x.vin) ? ' done' : '') + '"><div class="vin">' + vinH(x.vin, Math.min(q.length, 6)) + '</div><div class="fields">' + fieldTags(x, 'all') + '</div>'
     + (qs && m.length === 1 && !done(x.vin, qs.id) ? '<button class="pri" style="background:' + okColor(qs.color) + ';border-color:' + okColor(qs.color) + ';min-height:52px;font-size:17px" data-s="' + esc(qs.id) + '" data-v="' + esc(x.vin) + '">⚡ ' + esc(tr('Marcar')) + ' ' + esc(tr(qs.label)) + '</button>' : '')
     + stageButtons(x) + '</div>').join('');
   r.innerHTML = h; return m;
@@ -316,7 +316,7 @@ function render() {
   S.forEach(s => { const c = clean(s), one = c.slice(0, 1); AB[s.id] = S.filter(o => clean(o).slice(0, 1) === one).length > 1 ? c.slice(0, 2) : one; });
   $('list').innerHTML = sh.length ? sh.map(x => {
     const sub = COLS().filter(c => c.show === 'card' && x[c.key]).map(c => x[c.key]).join(' · ');
-    return '<li class="' + (finished(x.vin) ? 'done' : '') + '"><div class="grow"><div class="vin">' + vinH(x.vin) + '</div>' + (sub ? '<div class="sub2">' + esc(sub) + '</div>' : '') + '</div><div class="sq">'
+    return '<li class="' + (finished(x.vin) ? 'done' : '') + '"><button class="grow open" data-open="' + esc(x.vin) + '" aria-label="' + esc(tr('Ver detalle')) + ' ' + esc(x.vin) + '"><span class="vin">' + vinH(x.vin) + '</span>' + (sub ? '<span class="sub2">' + esc(sub) + '</span>' : '') + '</button><div class="sq">'
       + S.map(s => { const m = MARKS[x.vin] && MARKS[x.vin][s.id]; const on = !!(m && m.t);
         return '<button class="' + (on ? 'on' : '') + '" style="--c:' + okColor(s.color) + '" data-l="' + esc(s.id) + '" data-v="' + esc(x.vin) + '" aria-label="' + esc(tr(s.label)) + ': ' + esc(tr(on ? 'Hecho' : 'Pendiente')) + '" title="' + esc(tr(s.label)) + (on ? ' ' + esc(hh(m.t)) : '') + '">' + esc(AB[s.id]) + '</button>'; }).join('')
       + '</div></li>'; }).join('') : '<li class="empty">' + esc(tr('No hay carros aquí.')) + '</li>';
@@ -329,6 +329,7 @@ document.body.addEventListener('click', e => {
   if (d.s && d.v) toggle(d.v, d.s, false);
   else if (d.l && d.v) toggle(d.v, d.l, true);
   else if (d.d && d.v) openDetail(d.v, d.d);
+  else if (d.open) { $('q').value = d.open; search(); $('q').closest('.pad').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
   else if (d.chip) { fstage = fstage === d.chip ? '' : d.chip; fmode = fstage ? 'missing' : 'unfinished'; limit = 60; fillFilters(); render(); $('list').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
 });
 function quickMark(x) {
