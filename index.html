@@ -126,6 +126,7 @@ li{flex-wrap:wrap}li .grow{min-width:150px}.sub2{font-size:12px;color:var(--mut)
 [hidden]{display:none!important}
 @supports not (color: light-dark(#fff, #000)){:root{--bg:#f3f4f1;--card:#fff;--ink:#141714;--mut:#5d645e;--line:#dfe2dc;--ok:#17803f;--okBg:#e6f4ea;--warn:#8a5a00;--warnBg:#fff4d6;--ch:#1d5fd6;--chBg:#e7effd}@media (prefers-color-scheme:dark){:root{--bg:#111312;--card:#1b1e1c;--ink:#eef0ec;--mut:#9ba39c;--line:#2c312d;--ok:#3cc46e;--okBg:#173222;--warn:#f2c15a;--warnBg:#33290f;--ch:#6ea2ff;--chBg:#17233a}}}
 @media (prefers-color-scheme:dark){.sb:not(.on),.sq button:not(.on){color:var(--ink)}.sb:not(.on) small{color:var(--mut)}}
+.open{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;flex:1 1 150px;min-width:150px;min-height:44px;justify-content:center;border-radius:8px}.open:focus-visible{outline:3px solid var(--or);outline-offset:2px}.open .vin::after{content:" ›";color:var(--mut);font-weight:400}
 </style>
 </head>
 <body>
