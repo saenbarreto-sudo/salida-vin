@@ -4,7 +4,7 @@
    se guardan en el celular y se suben cuando vuelve la conexión. */
 (function () {
 'use strict';
-const VERSION = '2.0.6';
+const VERSION = '2.0.7';
 const CFG = window.CFG || {};
 const URL_ = (CFG.SUPABASE_URL || '').replace(/\/+$/, '');
 const KEY = CFG.SUPABASE_KEY || '';
@@ -254,7 +254,7 @@ function fillFilters() {
   $('fstage').innerHTML = '<option value="">' + esc(tr('Todas las fases')) + '</option>' + S.map(s => '<option value="' + esc(s.id) + '">' + esc(tr(s.label)) + '</option>').join('');
   if (fstage && !S.some(s => s.id === fstage)) fstage = '';
   $('fstage').value = fstage;
-  const modes = fstage ? [['missing', 'Les falta'], ['has', 'La tienen'], ['all', 'Todos']] : [['unfinished', 'Sin terminar'], ['finished', 'Terminados'], ['none', 'Sin empezar'], ['all', 'Todos']];
+  const modes = fstage ? [['has', 'La tienen'], ['missing', 'Les falta'], ['all', 'Todos']] : [['unfinished', 'Sin terminar'], ['finished', 'Terminados'], ['none', 'Sin empezar'], ['all', 'Todos']];
   if (!modes.some(m => m[0] === fmode)) fmode = modes[0][0];
   $('fmode').innerHTML = modes.map(m => '<option value="' + m[0] + '">' + esc(tr(m[1])) + '</option>').join(''); $('fmode').value = fmode;
   $('fcol').innerHTML = '<option value="">' + esc(tr('Filtrar por…')) + '</option>' + C.map(c => '<option value="' + esc(c.key) + '">' + esc(tr(c.label)) + '</option>').join('');
@@ -330,7 +330,7 @@ document.body.addEventListener('click', e => {
   else if (d.l && d.v) toggle(d.v, d.l, true);
   else if (d.d && d.v) openDetail(d.v, d.d);
   else if (d.open) { let n = 4; while (n < d.open.length && VEH.filter(x => x.vin.endsWith(d.open.slice(-n))).length > 1) n++; $('q').value = d.open.slice(-n); search(); $('q').closest('.pad').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
-  else if (d.chip) { fstage = fstage === d.chip ? '' : d.chip; fmode = fstage ? 'missing' : 'unfinished'; limit = 60; fillFilters(); render(); $('list').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  else if (d.chip) { fstage = fstage === d.chip ? '' : d.chip; fmode = fstage ? 'has' : 'unfinished'; limit = 60; fillFilters(); render(); $('list').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
 });
 function quickMark(x) {
   const s = STAGES().find(z => z.id === quick); if (!s || !x) return false;
@@ -342,7 +342,7 @@ $('q').addEventListener('input', () => search());
 $('q').addEventListener('keydown', e => { if (e.key === 'Enter') { const m = search(); if (m.length === 1 && quick) { quickMark(m[0]); $('q').value = ''; search(); } } });
 $('clr').onclick = () => { $('q').value = ''; search(); $('q').focus(); };
 $('qsel').onchange = e => { quick = e.target.value; fillQuick(); search(); };
-$('fstage').onchange = e => { fstage = e.target.value; limit = 60; fillFilters(); render(); };
+$('fstage').onchange = e => { fstage = e.target.value; fmode = fstage ? 'has' : 'unfinished'; limit = 60; fillFilters(); render(); };
 $('fmode').onchange = e => { fmode = e.target.value; limit = 60; render(); };
 $('fcol').onchange = e => { fcol = e.target.value; fval = ''; limit = 60; fillFilters(); render(); };
 $('fval').onchange = e => { fval = e.target.value; limit = 60; render(); };
