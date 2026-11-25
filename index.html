@@ -124,6 +124,24 @@ li{flex-wrap:wrap}li .grow{min-width:150px}.sub2{font-size:12px;color:var(--mut)
 .link{background:none;border:0;min-height:36px;padding:0;color:var(--mut);text-decoration:underline;font:inherit}
 .cfg{background:var(--warnBg);color:var(--warn);padding:14px;border-radius:12px;margin-top:14px}
 [hidden]{display:none!important}
+select#lng{float:right;margin:2px 0 8px 8px;width:auto;min-width:0;min-height:40px;padding:0 8px;background:#fff;border:1px solid #fff;color:#c2410c;font:700 14px Inter,system-ui,sans-serif;border-radius:10px}select#lng option{color:#141714;background:#fff}
+.flt{display:flex;flex-direction:column;gap:10px;margin:16px 0 12px}.fh{margin:0;font-weight:700;font-size:15px}
+.seg{display:flex;gap:4px;padding:4px;border-radius:12px;background:var(--line)}
+.seg button{flex:1;min-height:54px;border:0;background:transparent;border-radius:9px;color:var(--mut);font:600 13px/1.2 Inter,system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px}
+.seg button b{font:700 19px/1 "Barlow Semi Condensed",sans-serif}.seg button[aria-pressed=true]{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.fh2{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}.fh2 small{color:var(--mut);font-size:12px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.card{all:unset;box-sizing:border-box;cursor:pointer;border:1px solid var(--line);background:var(--card);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:6px;min-height:78px;color:var(--ink)}
+.card[aria-pressed=true]{border:2px solid var(--c);padding:9px;box-shadow:0 2px 8px rgba(0,0,0,.12)}.card:focus-visible{outline:3px solid var(--or);outline-offset:2px}
+.card .t{display:flex;align-items:center;gap:8px;font:600 13px/1.2 Inter,system-ui,sans-serif}
+.card .l{flex:none;min-width:24px;height:24px;padding:0 3px;box-sizing:border-box;border-radius:6px;background:var(--c);color:var(--f);font:700 12px system-ui;display:grid;place-items:center}
+.card .n{font:700 21px/1 "Barlow Semi Condensed",sans-serif}.card .n small{font:400 12px Inter,system-ui,sans-serif;color:var(--mut)}
+.card .bar{display:block;height:5px;border-radius:3px;background:var(--line);overflow:hidden}.card .bar i{display:block;height:100%;background:var(--c)}
+.hm{display:flex;gap:8px}.hm button{flex:1;min-height:46px;border-radius:10px;border:2px solid var(--c);background:transparent;color:var(--ink);font:600 14px Inter,system-ui,sans-serif}.hm button[aria-pressed=true]{background:var(--c);color:var(--f)}
+.cf{display:flex;align-items:center;gap:6px;overflow-x:auto;padding:2px 0;-webkit-overflow-scrolling:touch}.cf span{flex:none;color:var(--mut);font-weight:600;font-size:13px}
+.cf button{flex:none;min-height:38px;padding:0 13px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:600 13px Inter,system-ui,sans-serif}.cf button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sum{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-radius:10px;background:rgba(255,90,31,.13);color:var(--ink);font-size:14px;line-height:1.35}
+.sum button{flex:none;min-height:38px;padding:0 10px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-weight:600}
 @supports not (color: light-dark(#fff, #000)){:root{--bg:#f3f4f1;--card:#fff;--ink:#141714;--mut:#5d645e;--line:#dfe2dc;--ok:#17803f;--okBg:#e6f4ea;--warn:#8a5a00;--warnBg:#fff4d6;--ch:#1d5fd6;--chBg:#e7effd}@media (prefers-color-scheme:dark){:root{--bg:#111312;--card:#1b1e1c;--ink:#eef0ec;--mut:#9ba39c;--line:#2c312d;--ok:#3cc46e;--okBg:#173222;--warn:#f2c15a;--warnBg:#33290f;--ch:#6ea2ff;--chBg:#17233a}}}
 @media (prefers-color-scheme:dark){.sb:not(.on),.sq button:not(.on){color:var(--ink)}.sb:not(.on) small{color:var(--mut)}}
 .open{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;flex:1 1 150px;min-width:150px;min-height:44px;justify-content:center;border-radius:8px}.open:focus-visible{outline:3px solid var(--or);outline-offset:2px}.open .vin::after{content:" ›";color:var(--mut);font-weight:400}
@@ -131,11 +149,10 @@ li{flex-wrap:wrap}li .grow{min-width:150px}.sub2{font-size:12px;color:var(--mut)
 </head>
 <body>
 <header><div class="hw">
-  <div class="top"><h1 id="ttl">Salida VIN</h1><button id="fs" class="hb" type="button">⛶ Pantalla completa</button><button id="lng" class="hb" type="button">EN</button></div>
+  <div class="top"><h1 id="ttl">Salida VIN</h1><button id="fs" class="hb" type="button">⛶ Pantalla completa</button><select id="lng" class="hb" aria-label="Idioma"><option value="es">Español</option><option value="en">English</option><option value="ko">한국어</option><option value="zh">中文</option></select></div>
   <p class="sub"><span id="lname"></span> · <span class="dot" id="dot"></span><span id="sync">Conectando…</span></p>
   <div id="lbar" class="lbar" hidden><label for="lsel">Lista</label><select id="lsel"></select></div>
   <div class="stats"><span><b id="sTot">0</b> carros</span><span><b id="sDone">0</b> terminados</span><span><b id="sNone">0</b> sin empezar</span></div>
-  <div class="chips" id="chips"></div>
 </div></header>
 <main>
 <div id="cfg" class="cfg" hidden>Falta configurar Supabase: abre config.js y pon SUPABASE_URL y SUPABASE_KEY.</div>
@@ -145,8 +162,15 @@ li{flex-wrap:wrap}li .grow{min-width:150px}.sub2{font-size:12px;color:var(--mut)
   <div id="qban" class="qbanner" hidden></div>
   <p class="hint">Escribe 4 dígitos (5 si hay dos iguales). Toca una fase para marcarla o desmarcarla; ⋯ para nota o foto. En modo rápido, Enter o el escáner marcan la fase elegida.</p>
   <div id="res" aria-live="polite"></div></section>
-<div class="filt"><select id="fstage" aria-label="Fase"></select><select id="fmode" aria-label="Mostrar"></select></div>
-<div class="filt" style="margin-top:0"><select id="fcol" aria-label="Columna"></select><select id="fval" aria-label="Valor"></select></div>
+<section class="flt">
+  <p class="fh">Ver carros</p>
+  <div id="seg" class="seg"></div>
+  <div class="fh2"><span class="fh">Por fase</span><small>Toca una fase para filtrar</small></div>
+  <div id="cards" class="cards"></div>
+  <div id="hm" class="hm" hidden></div>
+  <div id="cf"></div>
+  <div id="sum" class="sum" aria-live="polite"></div>
+</section>
 <ul id="list"></ul><button id="more" class="more">Ver más</button>
 <section class="tools"><p>Lista y respaldo</p>
   <button id="xls" class="pri">Exportar a Excel</button><button id="copy">Copiar resumen</button>
