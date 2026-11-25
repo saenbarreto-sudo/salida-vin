@@ -4,7 +4,7 @@
    se guardan en el celular y se suben cuando vuelve la conexión. */
 (function () {
 'use strict';
-const VERSION = '2.0.5';
+const VERSION = '2.0.6';
 const CFG = window.CFG || {};
 const URL_ = (CFG.SUPABASE_URL || '').replace(/\/+$/, '');
 const KEY = CFG.SUPABASE_KEY || '';
@@ -329,7 +329,7 @@ document.body.addEventListener('click', e => {
   if (d.s && d.v) toggle(d.v, d.s, false);
   else if (d.l && d.v) toggle(d.v, d.l, true);
   else if (d.d && d.v) openDetail(d.v, d.d);
-  else if (d.open) { $('q').value = d.open; search(); $('q').closest('.pad').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  else if (d.open) { let n = 4; while (n < d.open.length && VEH.filter(x => x.vin.endsWith(d.open.slice(-n))).length > 1) n++; $('q').value = d.open.slice(-n); search(); $('q').closest('.pad').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
   else if (d.chip) { fstage = fstage === d.chip ? '' : d.chip; fmode = fstage ? 'missing' : 'unfinished'; limit = 60; fillFilters(); render(); $('list').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
 });
 function quickMark(x) {
