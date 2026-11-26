@@ -4,7 +4,7 @@
    se guardan en el celular y se suben cuando vuelve la conexión. */
 (function () {
 'use strict';
-const VERSION = '2.1.0';
+const VERSION = '2.1.1';
 const CFG = window.CFG || {};
 const URL_ = (CFG.SUPABASE_URL || '').replace(/\/+$/, '');
 const KEY = CFG.SUPABASE_KEY || '';
@@ -53,7 +53,7 @@ const EN = {
   'Las fotos necesitan conexión':'Photos need a connection','El historial necesita conexión':'History needs a connection','Sin cambios todavía.':'No changes yet.',
   'Hecho':'Done','Pendiente':'Pending','Abriendo cámara…':'Opening camera…','Apunta al código de barras del VIN':'Point at the VIN barcode',
   'No se pudo abrir la cámara. Revisa el permiso en Ajustes > Safari > Cámara.':"Couldn't open the camera. Check Settings > Safari > Camera.",
-  'No está en esta lista':'Not in this list','Ver detalle':'Open','Casilla':'Checkbox','Código leído':'Code read','Fase':'Stage'
+  'No está en esta lista':'Not in this list','Ver detalle':'Open','Casilla':'Checkbox','Código leído':'Code read','Apunta al código QR o de barras del VIN':'Point at the VIN QR code or barcode','Fase':'Stage'
 ,"Ver carros":"Show cars","Por fase":"By stage","Toca una fase para filtrar":"Tap a stage to filter","de":"of","Ya la tienen":"Already done","Les falta":"Still missing","Quitar":"Clear","Idioma":"Language","Mostrando {n} carros sin terminar":"Showing {n} unfinished cars","Mostrando {n} carros terminados":"Showing {n} finished cars","Mostrando los {n} carros":"Showing all {n} cars","{n} carros ya tienen {s}":"{n} cars already have {s}","A {n} carros les falta {s}":"{n} cars still need {s}"
 };
 const KO = {
@@ -219,6 +219,7 @@ const KO = {
 "Ver detalle": "열기",
 "Casilla": "체크박스",
 "Código leído": "읽은 코드",
+"Apunta al código QR o de barras del VIN": "VIN QR 코드나 바코드를 비추세요",
 "Ver carros": "차량 보기",
 "Por fase": "단계별",
 "Toca una fase para filtrar": "단계를 눌러 필터링",
@@ -394,6 +395,7 @@ const ZH = {
 "Ver detalle": "打开",
 "Casilla": "复选框",
 "Código leído": "已读取的条码",
+"Apunta al código QR o de barras del VIN": "对准 VIN 二维码或条形码",
 "Ver carros": "查看车辆",
 "Por fase": "按阶段",
 "Toca una fase para filtrar": "点击阶段进行筛选",
@@ -963,11 +965,12 @@ function vinFrom(text) {
 function onCode(text) {
   const now = Date.now(); if (text === lastCode && now - lastAt < 2500) return; lastCode = text; lastAt = now;
   const { x, vin } = vinFrom(text);
-  if (!x) { $('camS').textContent = tr('No está en esta lista') + ': ' + vin; return; }
+  if (!x) { $('camS').textContent = tr('No está en esta lista') + ': ' + String(vin).slice(0, 40); return; }
   beep();
   if (quick) { quickMark(x); const s = STAGES().find(z => z.id === quick); $('camS').textContent = '⚡ ' + x.vin.slice(-6) + ' · ' + (s ? tr(s.label) : '') + ' ✓'; return; }
   stopScan(); close_('cm'); $('q').value = x.vin; search(); $('res').scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
+const CAMV = { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 }, advanced: [{ focusMode: 'continuous' }] };
 async function startScan() {
   const v = $('camv'); $('camS').textContent = tr('Abriendo cámara…'); open_('cm');
   try {
@@ -976,8 +979,8 @@ async function startScan() {
       const want = ['code_39', 'code_128', 'qr_code', 'data_matrix', 'pdf417'].filter(f => fm.includes(f));
       if (want.length) {
         const det = new window.BarcodeDetector({ formats: want });
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
-        v.srcObject = stream; await v.play(); $('camS').textContent = tr('Apunta al código de barras del VIN');
+        const stream = await navigator.mediaDevices.getUserMedia({ video: CAMV, audio: false });
+        v.srcObject = stream; await v.play(); $('camS').textContent = tr('Apunta al código QR o de barras del VIN');
         let alive = true; scan = { stop: () => { alive = false; stream.getTracks().forEach(t => t.stop()); v.srcObject = null; } };
         const loop = async () => { if (!alive) return; try { const r = await det.detect(v); if (r && r[0]) onCode(r[0].rawValue); } catch (e) {} setTimeout(loop, 200); };
         loop(); return;
@@ -990,9 +993,9 @@ async function startScan() {
     const reader = new Z.BrowserMultiFormatReader(hints, 300);
     scan = { stop: () => { try { reader.reset(); } catch (e) {} } };
     const cb = r => { if (r) onCode(r.getText ? r.getText() : r.text); };
-    if (reader.decodeFromConstraints) await reader.decodeFromConstraints({ video: { facingMode: 'environment' } }, v, cb);
+    if (reader.decodeFromConstraints) await reader.decodeFromConstraints({ video: CAMV }, v, cb);
     else await reader.decodeFromVideoDevice(undefined, v, cb);
-    $('camS').textContent = tr('Apunta al código de barras del VIN');
+    $('camS').textContent = tr('Apunta al código QR o de barras del VIN');
   } catch (e) { $('camS').textContent = tr('No se pudo abrir la cámara. Revisa el permiso en Ajustes > Safari > Cámara.'); }
 }
 function stopScan() { if (scan) { try { scan.stop(); } catch (e) {} scan = null; } }
