@@ -1,5 +1,5 @@
 /* Service worker: la app abre sin señal. Sube CACHE cuando cambies archivos. */
-const CACHE = 'salida-vin-v2.1.0';
+const CACHE = 'salida-vin-v2.1.1';
 const SHELL = ['./', 'index.html', 'app.js', 'config.js', 'manifest.json', 'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png'];
 const LIBS = ['https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js', 'https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js'];
 
